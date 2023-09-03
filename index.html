@@ -52,39 +52,6 @@
             background: rgb(255, 255, 255, 0.2);
         }
 
-        @media (max-width: 968px) {
-            .top button:hover {
-                background: rgb(255, 255, 255, 0) !important;
-            }
-
-            .handle p {
-                margin-left: 26px !important;
-                transform: translateY(-130%);
-            }
-
-            .border::after {
-                width: 60px !important;
-                height: 60px !important;
-            }
-
-            .handle {
-                width: 60px !important;
-                height: 60px !important;
-                left: calc(50% - 30px);
-                top: 315px;
-            }
-
-            .handle p {
-                position: fixed !important;
-                top: 130px !important;
-                left: 50% !important;
-                margin: 0 !important;
-                font-size: 20pt !important;
-                transform: translateX(-50%) !important;
-            }
-
-        }
-
         .top:hover button {
             opacity: 1;
         }
@@ -219,13 +186,34 @@
 
         .container {
             width: 100%;
-            height: calc(100% - 290px);
+            height: calc(100% - 260px);
             position: absolute;
             bottom: 0;
         }
 
         .container * {
             height: 5%;
+        }
+
+        @media (max-width: 968px) {
+            .top button:hover {
+                background: rgb(255, 255, 255, 0);
+            }
+
+            .handle p {
+                margin-left: 26px;
+                transform: translateY(-130%);
+            }
+
+            .handle p {
+                position: fixed;
+                top: 130px;
+                left: 50%;
+                margin: 0;
+                font-size: 20pt;
+                transform: translateX(-50%);
+            }
+
         }
     </style>
 </head>
