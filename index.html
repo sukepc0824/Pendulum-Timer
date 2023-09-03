@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendulum Timer</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+
+        body {
+            background-color: #2E3540;
+            font-family: 'Space Mono', monospace;
+            overflow: hidden;
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            gap: 32px;
+            transform: translateX(-50%);
+            margin-top: 50px;
+            pointer-events: none;
+            padding: 10px;
+            opacity: 0;
+            transition: all 0.4s;
+        }
+
+        .top.start {
+            pointer-events: all;
+            opacity: 1;
+        }
+
+        .top button {
+            opacity: 0;
+            transition: all 0.4s;
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: none;
+            border-radius: 50%;
+            padding: 10px;
+            position: relative;
+        }
+
+        .top button:hover {
+            background: rgb(255, 255, 255, 0.2);
+        }
+
+        .top:hover button {
+            opacity: 1;
+        }
+
+        .top button img {
+            opacity: 0.8;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 15px;
+        }
+
+        .top button img.restart {
+            display: none;
+        }
+
+        .top button.pause img.stop {
+            display: none;
+        }
+
+        .top button.pause img.restart {
+            display: block;
+            margin-left: 2px;
+        }
+
+        .limit {
+            color: #fff;
+            font-size: 32pt;
+            transition: all 0.6s;
+            filter: blur(19px);
+            opacity: 0;
+        }
+
+        .limit.show {
+            filter: blur(0px);
+            opacity: 1;
+        }
+
+        .border {
+            width: 3px;
+            background-color: #eee;
+            transform-origin: top center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 240px;
+            height: 105px;
+        }
+
+        .border.stop {
+            animation-play-state: paused;
+        }
+
+        .border.animate {
+            animation-name: none;
+            animation-duration: var(--time);
+            animation-timing-function: cubic-bezier(0.42, 0, 0.56, 1);
+            animation-iteration-count: infinite;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes furiko {
+            from {
+                transform: rotate(var(--deg));
+            }
+
+            50% {
+                transform: rotate(var(--deg-minus));
+            }
+
+            to {
+                transform: rotate(var(--deg));
+            }
+        }
+
+        .border::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #eee;
+            border-radius: 50%;
+            transform: translateX(-50%) translateY(50%);
+            bottom: 0;
+        }
+
+        .handle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            z-index: 1000;
+            position: absolute;
+            left: calc(50% - 25px);
+            top: 320px;
+        }
+
+        .handle p {
+            position: absolute;
+            color: #fff;
+            left: 100%;
+            margin-left: 14px;
+            font-size: 18pt;
+            transition: all 0.6s;
+        }
+
+        .handle p.hide {
+            filter: blur(19px);
+            opacity: 0;
+        }
+
+
+        .handle p::after {
+            content: 'min';
+            position: absolute;
+            color: #fff;
+            left: 100%;
+            margin-left: 5px;
+            font-size: 18pt;
+            bottom:0;
+            opacity: 0.8;
+        }
+
+        .handle.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            height: calc(100% - 290px);
+            position: absolute;
+            bottom: 0;
+        }
+
+        .container * {
+            height: 5%;
+        }
+    </style>
+</head>
+
+<body>
+    <audio src="sound.mp3"></audio>
+    <div class="top">
+        <button class="cancel"><img src="cancel.svg"></button>
+        <p class="limit">0:00</p>
+        <button class="stop"><img src="stop.svg" class="stop"><img src="restart.svg" class="restart"></button>
+    </div>
+    <div class="handle">
+        <p class="hide">
+        </p>
+    </div>
+    <div class="container">
+        <div time="1"></div>
+        <div time="2"></div>
+        <div time="3"></div>
+        <div time="5"></div>
+        <div time="10"></div>
+        <div time="15"></div>
+        <div time="20"></div>
+        <div time="25"></div>
+        <div time="30"></div>
+        <div time="35"></div>
+        <div time="40"></div>
+        <div time="45"></div>
+        <div time="50"></div>
+        <div time="55"></div>
+        <div time="60"></div>
+        <div time="70"></div>
+        <div time="80"></div>
+        <div time="90"></div>
+    </div>
+    <div class="border"></div>
+    <footer style="position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); color: white; opacity: 0.6;">Copyright © 2023 スケ/Suke @pcsuke. All rights reserved.</footer>
+    <script>
+        $(function () {
+            function calcAngleDegrees(x, y) {
+                return (Math.atan2(y, x) * 180) / Math.PI;
+            }
+
+            borderX = $(".border").offset().left;
+            borderY = $(".border").offset().top;
+            $(".handle").draggable({
+                containment: '.container',
+                scroll: false,
+                drag: function (e, ui) {
+                    $(".handle p").removeClass("hide");
+                    $(window).height() - 240;
+
+                    let x = $(".handle").offset().left - borderX + 25;
+                    let y = $(".handle").offset().top - borderY + 25;
+                    let height = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+                    $(".border").css({
+                        "transform": `rotate(${calcAngleDegrees(x, y) - 90}deg)`,
+                        "height": height
+                    });
+                    $(".handle.animate").offset({ top: $() })
+
+                },
+                stop: function (e, ui) {
+                    $(".border").removeClass("stop");
+                    $(".limit").removeClass("stop");
+                    $("button.stop").removeClass("pause");
+
+                    $(".handle p").addClass("hide");
+                    $(".top").addClass("start");
+                    let x = $(".handle").offset().left - borderX + 25;
+                    let y = $(".handle").offset().top - borderY + 25;
+                    let height = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+                    $(".border").addClass("animate");
+                    console.log(calcAngleDegrees(x, y) - 90)
+                    deg = calcAngleDegrees(x, y) - 90;
+                    document.querySelector(".border").style.setProperty("--deg", calcAngleDegrees(x, y) - 90 + "deg");
+                    document.querySelector(".border").style.setProperty("--deg-minus", -(calcAngleDegrees(x, y) - 90) + "deg");
+                    $(".border.animate").css('animation-name', 'furiko');
+                    $(".border.animate").css('animation-iteration-count', 'infinite');
+                    time = Math.sqrt(height) / 6;
+                    countdown()
+                    document.querySelector(".border").style.setProperty("--time", time + "s");
+
+                    $(".limit").text(Math.floor(limitTimeSecond / 60) + ":" + "00")
+                    $(".limit").addClass("show");
+                    $(".handle").addClass("hide");
+                }
+            });
+
+            $(".container div").droppable({
+                over(event, ui) {
+                    $(".handle p").text($(this).attr("time"))
+                    limitTimeSecond = $(this).attr("time") * 60;
+                }
+            });
+
+            $("button.cancel").on("click", function () {
+                $(".border").removeClass("stop");
+                $(".top").removeClass("start");
+                $(".limit").removeClass("show");
+                $(".handle").removeClass("hide");
+                document.querySelector(".border").addEventListener('animationiteration', () => {
+                    if (!$(".handle").hasClass("hide")) {
+                        $(".border.animate").css('animation-name', 'none');
+                    }
+                })
+                clearInterval(interval)
+            })
+
+            function countdown() {
+                interval = setInterval(function () {
+                    if (limitTimeSecond == 0) {
+                        console.log(1)
+                        $("audio").get(0).play();
+                        return false;
+                    }
+                    limitTimeSecond -= 1
+                    $(".limit").text(Math.floor(limitTimeSecond / 60) + ":" + ('00' + limitTimeSecond % 60).slice(-2))
+                }, 1000)
+            }
+
+            $("button.stop").on("click", function () {
+                $(".limit").toggleClass("stop");
+                $(".border").toggleClass("stop");
+                $("button.stop").toggleClass("pause");
+                if ($(".limit").hasClass("stop")) {
+                    clearInterval(interval)
+                } else {
+                    countdown()
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>
