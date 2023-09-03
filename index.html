@@ -48,15 +48,14 @@
             position: relative;
         }
 
-        @media (min-width: 768px) {
-        .top button:hover {
-            background: rgb(255, 255, 255, 0) !important;
-        }
-        }
-
-
         .top button:hover {
             background: rgb(255, 255, 255, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            .top button:hover {
+                background: rgb(255, 255, 255, 0) !important;
+            }
         }
 
         .top:hover button {
@@ -235,7 +234,7 @@
         <div time="90"></div>
     </div>
     <div class="border"></div>
-    <footer style="position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); color: white; opacity: 0.6;">Copyright © 2023 スケ/Suke @pcsuke. All rights reserved.</footer>
+    <footer style="position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); color: white; opacity: 0.6;">Copyright © 2023 スケ/Suke @pcsuke.</footer>
     <script>
         $(function () {
             function calcAngleDegrees(x, y) {
