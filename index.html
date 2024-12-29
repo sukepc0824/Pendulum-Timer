@@ -394,7 +394,7 @@
                 var y = cX * sY * cZ + sX * cY * sZ;
                 var z = cX * cY * sZ + sX * sY * cZ;
 
-                return [w, x, y, z];
+                return [int(w * 1000), int(x * 1000), int(y * 1000), int(z * 1000)];
 
             }
 
