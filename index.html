@@ -368,9 +368,9 @@
 
             function handleOrientation(event) {
                 if (is_timer) {
-                    $("main").css("transform", 'rotate(' + getQuaternion(event.alpha, event.beta, event.gamma)[2] * degtorad + 'deg)')
+                    $("main").css("transform", 'rotate(' + getQuaternion(event.alpha, event.beta, event.gamma)[1] + 'turn)')
                 } else {
-                    $("main").css("transform", 'rotate(0deg)')
+                    $("main").css("transform", 'rotate(0)')
                 }
                 $("p.debug").text(getQuaternion(event.alpha, event.beta, event.gamma))
             }
@@ -394,7 +394,7 @@
                 var y = cX * sY * cZ + sX * cY * sZ;
                 var z = cX * cY * sZ + sX * sY * cZ;
 
-                return [parseInt(w*1000), parseInt(x*1000), parseInt(y*1000), parseInt(z*1000)];
+                return [w, x, y, z];
 
             }
 
