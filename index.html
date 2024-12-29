@@ -367,12 +367,12 @@
             var degtorad = Math.PI / 180; /*  度° ↔ ラジアン 間の換算用  */
 
             function handleOrientation(event) {
-                console.log(getQuaternion(event.alpha, event.beta, event.gamma))
                 if (is_timer) {
-                    $("main").css("transform", 'rotate(' + getQuaternion(event.alpha, event.beta, event.gamma)[2]/2 + 'turn)')
+                    $("main").css("transform", 'rotate(' + getQuaternion(event.alpha, event.beta, event.gamma)[2] * degtorad + 'deg)')
                 } else {
                     $("main").css("transform", 'rotate(0deg)')
                 }
+                $("p.debug").text(getQuaternion(event.alpha, event.beta, event.gamma)[2])
             }
             function getQuaternion(alpha, beta, gamma) {
 
