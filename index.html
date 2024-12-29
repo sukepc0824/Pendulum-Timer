@@ -9,12 +9,13 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="jquery.ui.touch-punch.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&display=swap');
 
         body {
-            background-color: #2E3540;
-            font-family: 'Space Mono', monospace;
+            background-color: #000000;
+            font-family: 'Fragment Mono', monospace;
             overflow: hidden;
+            font-weight: 300;
         }
 
         .top {
@@ -95,7 +96,7 @@
         }
 
         .border {
-            width: 3px;
+            width: 2px;
             background-color: #eee;
             transform-origin: top center;
             position: absolute;
@@ -112,7 +113,7 @@
         .border.animate {
             animation-name: none;
             animation-duration: var(--time);
-            animation-timing-function: cubic-bezier(0.42, 0, 0.56, 1);
+            animation-timing-function: cubic-bezier(0.42, 0, 0.54, 1);
             animation-iteration-count: infinite;
             animation-fill-mode: forwards;
         }
@@ -175,7 +176,7 @@
             left: 100%;
             margin-left: 5px;
             font-size: 18pt;
-            bottom:0;
+            bottom: 0;
             opacity: 0.8;
         }
 
@@ -219,6 +220,7 @@
 </head>
 
 <body>
+    <p class="debug" style="color: #fff;"></p>
     <audio src="sound.mp3"></audio>
     <div class="top">
         <button class="cancel"><img src="cancel.svg"></button>
@@ -250,7 +252,8 @@
         <div time="90"></div>
     </div>
     <div class="border"></div>
-    <footer style="position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); color: white; opacity: 0.6;">Copyright © 2023 スケ/Suke @pcsuke.</footer>
+    <footer style="position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); color: white; opacity: 0.6;">
+        Copyright © 2023 スケ/Suke @pcsuke.</footer>
     <script>
         $(function () {
             function calcAngleDegrees(x, y) {
@@ -293,7 +296,7 @@
                     document.querySelector(".border").style.setProperty("--deg-minus", -(calcAngleDegrees(x, y) - 90) + "deg");
                     $(".border.animate").css('animation-name', 'furiko');
                     $(".border.animate").css('animation-iteration-count', 'infinite');
-                    time = Math.sqrt(height) / 6;
+                    time = Math.sqrt(height) / 8;
                     countdown()
                     document.querySelector(".border").style.setProperty("--time", time + "s");
 
@@ -345,7 +348,39 @@
                     countdown()
                 }
             })
+
+
+            var degtorad = Math.PI / 180; /*  度° ↔ ラジアン 間の換算用  */
+
+            function handleOrientation(event) {
+                $("p.debug").text(getQuaternion(event.alpha, event.beta.event.gamma))
+            }
+            function getQuaternion(alpha, beta, gamma) {
+
+                var _x = beta ? beta * degtorad : 0; // β 値
+                var _y = gamma ? gamma * degtorad : 0; // γ 値
+                var _z = alpha ? alpha * degtorad : 0; // α 値
+
+                var cX = Math.cos(_x / 2);
+                var cY = Math.cos(_y / 2);
+                var cZ = Math.cos(_z / 2);
+                var sX = Math.sin(_x / 2);
+                var sY = Math.sin(_y / 2);
+                var sZ = Math.sin(_z / 2);
+
+                /*  ZXY 四元数の構築  */
+
+                var w = cX * cY * cZ - sX * sY * sZ;
+                var x = sX * cY * cZ - cX * sY * sZ;
+                var y = cX * sY * cZ + sX * cY * sZ;
+                var z = cX * cY * sZ + sX * sY * cZ;
+
+                return [w, x, y, z];
+
+            }
+            window.addEventListener("deviceorientation", handleOrientation);
         })
+
     </script>
 </body>
 
