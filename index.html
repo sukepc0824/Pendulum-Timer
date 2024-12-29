@@ -368,7 +368,7 @@
 
             function handleOrientation(event) {
                 if (is_timer) {
-                    $("main").css("transform", 'rotate(' + getQuaternion(event.alpha, event.beta, event.gamma)[1] + 'turn)')
+                    $("main").css("transform", 'rotate(' + getQuaternion(event.alpha, event.beta, event.gamma)[1]/2 + 'turn)')
                 } else {
                     $("main").css("transform", 'rotate(0)')
                 }
