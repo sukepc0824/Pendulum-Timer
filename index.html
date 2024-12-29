@@ -368,7 +368,7 @@
 
             function handleOrientation(event) {
                 if (is_timer) {
-                    $("main").css("transform", 'rotate(' + getQuaternion(event.alpha, event.beta, event.gamma) + 'deg)')
+                    $("main").css("transform", 'rotate(' + getQuaternion(event.alpha, event.beta, event.gamma)[2] * degtorad + 'deg)')
                 } else {
                     $("main").css("transform", 'rotate(0deg)')
                 }
@@ -380,33 +380,25 @@
                 var _y = gamma ? gamma * degtorad : 0; // γ 値
                 var _z = alpha ? alpha * degtorad : 0; // α 値
 
-                var cX = Math.cos(_x);
-                var cY = Math.cos(_y);
-                var cZ = Math.cos(_z);
-                var sX = Math.sin(_x);
-                var sY = Math.sin(_y);
-                var sZ = Math.sin(_z);
+                var cX = Math.cos(_x / 2);
+                var cY = Math.cos(_y / 2);
+                var cZ = Math.cos(_z / 2);
+                var sX = Math.sin(_x / 2);
+                var sY = Math.sin(_y / 2);
+                var sZ = Math.sin(_z / 2);
 
-                /*  V の x , y 成分を計算する  */
-                var Vx = - cZ * sY - sZ * sX * cY;
-                var Vy = - sZ * sY + cZ * sX * cY;
+                /*  ZXY 四元数の構築  */
 
-                /*  コンパスの向きを計算する  */
-                var compassHeading = Math.atan(Vx / Vy);
+                var w = cX * cY * cZ - sX * sY * sZ;
+                var x = sX * cY * cZ - cX * sY * sZ;
+                var y = cX * sY * cZ + sX * cY * sZ;
+                var z = cX * cY * sZ + sX * sY * cZ;
 
-                /*  コンパスの向きを， 0 以上 2 π 未満に換算する  */
-                if (Vy < 0) {
-                    compassHeading += Math.PI;
-                } else if (Vx < 0) {
-                    compassHeading += 2 * Math.PI;
-                }
-
-                return compassHeading * (180 / Math.PI); /*  度°によるコンパスの向き  */
-
+                return [parseInt(w*1000), parseInt(x*1000), parseInt(y*1000), parseInt(z*1000)];
 
             }
 
-            window.addEventListener("deviceorientationabsolute", handleOrientation);
+            window.addEventListener("deviceorientation", handleOrientation);
         })
 
     </script>
