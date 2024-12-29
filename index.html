@@ -216,6 +216,13 @@
             }
 
         }
+
+        main {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-origin: center 240px;
+        }
     </style>
 </head>
 
@@ -227,31 +234,34 @@
         <p class="limit">0:00</p>
         <button class="stop"><img src="stop.svg" class="stop"><img src="restart.svg" class="restart"></button>
     </div>
-    <div class="handle">
-        <p class="hide">
-        </p>
-    </div>
-    <div class="container">
-        <div time="1"></div>
-        <div time="2"></div>
-        <div time="3"></div>
-        <div time="5"></div>
-        <div time="10"></div>
-        <div time="15"></div>
-        <div time="20"></div>
-        <div time="25"></div>
-        <div time="30"></div>
-        <div time="35"></div>
-        <div time="40"></div>
-        <div time="45"></div>
-        <div time="50"></div>
-        <div time="55"></div>
-        <div time="60"></div>
-        <div time="70"></div>
-        <div time="80"></div>
-        <div time="90"></div>
-    </div>
-    <div class="border"></div>
+    <main>
+        <div class="handle">
+            <p class="hide">
+            </p>
+        </div>
+        <div class="container">
+            <div time="1"></div>
+            <div time="2"></div>
+            <div time="3"></div>
+            <div time="5"></div>
+            <div time="10"></div>
+            <div time="15"></div>
+            <div time="20"></div>
+            <div time="25"></div>
+            <div time="30"></div>
+            <div time="35"></div>
+            <div time="40"></div>
+            <div time="45"></div>
+            <div time="50"></div>
+            <div time="55"></div>
+            <div time="60"></div>
+            <div time="70"></div>
+            <div time="80"></div>
+            <div time="90"></div>
+        </div>
+        <div class="border"></div>
+    </main>
+
     <footer style="position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); color: white; opacity: 0.6;">
         Copyright © 2023 スケ/Suke @pcsuke.</footer>
     <script>
@@ -259,6 +269,8 @@
             function calcAngleDegrees(x, y) {
                 return (Math.atan2(y, x) * 180) / Math.PI;
             }
+
+            is_timer = false;
 
             borderX = $(".border").offset().left;
             borderY = $(".border").offset().top;
@@ -303,6 +315,7 @@
                     $(".limit").text(Math.floor(limitTimeSecond / 60) + ":" + "00")
                     $(".limit").addClass("show");
                     $(".handle").addClass("hide");
+                    is_timer = true;
                 }
             });
 
@@ -344,6 +357,7 @@
                 $("button.stop").toggleClass("pause");
                 if ($(".limit").hasClass("stop")) {
                     clearInterval(interval)
+                    is_timer = false;
                 } else {
                     countdown()
                 }
@@ -353,7 +367,12 @@
             var degtorad = Math.PI / 180; /*  度° ↔ ラジアン 間の換算用  */
 
             function handleOrientation(event) {
-                $("p.debug").text(getQuaternion(event.alpha, event.beta, event.gamma)[2])
+                if (is_timer) {
+                    console.log(getQuaternion(event.alpha, event.beta, event.gamma)[2])
+                    $("main").css("transform", 'rotate(' + getQuaternion(event.alpha, event.beta, event.gamma)[2]/2 + 'turn)')
+                } else {
+                    $("main").css("transform", 'rotate(0deg)')
+                }
             }
             function getQuaternion(alpha, beta, gamma) {
 
